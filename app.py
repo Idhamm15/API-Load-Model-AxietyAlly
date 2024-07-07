@@ -11,7 +11,7 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
 # Memuat model
-model = load_model('model/pose_classification_model.h5')
+model = load_model('pose_classification_model.h5')
 
 # Fungsi untuk mengekstrak landmark pose
 def extract_pose_landmarks(image):
