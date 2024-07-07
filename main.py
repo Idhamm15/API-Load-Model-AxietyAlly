@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify
 from tensorflow.keras.models import load_model
 import numpy as np
 import cv2
@@ -31,24 +31,47 @@ def predict_pose(image):
     pose_classes = ['TreePose', 'TrianglePose', 'StandingForwardBendPose']
     return pose_classes[class_id]
 
-@app.route('/', methods=['GET'])
+# Route untuk halaman utama
+@app.route('/')
 def hello():
     return "Hello, World!"
 
-# @app.route('/video_feed', methods=['POST'])
-# def video_feed():
-#     if 'image' not in request.files:
-#         return jsonify({'error': 'No image provided'}), 400
+# Route untuk prediksi pose dari video feed
+@app.route('/video_feed', methods=['POST'])
+def video_feed():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
 
-#     # Membaca gambar dari request
-#     file = request.files['image']
-#     image = np.frombuffer(file.read(), np.uint8)
-#     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    # Membaca gambar dari request
+    file = request.files['image']
+    image = np.frombuffer(file.read(), np.uint8)
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-#     # Prediksi pose
-#     predicted_pose = predict_pose(image)
+    # Prediksi pose
+    predicted_pose = predict_pose(image)
     
-#     return jsonify({'pose': predicted_pose})
+    return jsonify({'pose': predicted_pose})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Menjalankan aplikasi Flask dengan Gunicorn
+    from gunicorn.app.base import BaseApplication
+
+    class FlaskApplication(BaseApplication):
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.application = app
+            super().__init__()
+
+        def load_config(self):
+            for key, value in self.options.items():
+                self.cfg.set(key, value)
+
+        def load(self):
+            return self.application
+
+    options = {
+        'bind': '127.0.0.1:5000',
+        'workers': 4,
+    }
+
+    FlaskApplication(app, options).run()
