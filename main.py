@@ -31,7 +31,7 @@ def predict_pose(image):
     pose_classes = ['TreePose', 'TrianglePose', 'StandingForwardBendPose']
     return pose_classes[class_id]
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def hello():
     return "Hello, World!"
 
