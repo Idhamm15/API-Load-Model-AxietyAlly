@@ -31,20 +31,24 @@ def predict_pose(image):
     pose_classes = ['TreePose', 'TrianglePose', 'StandingForwardBendPose']
     return pose_classes[class_id]
 
-@app.route('/video_feed', methods=['POST'])
-def video_feed():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
+@app.route('/')
+def hello():
+    return "Hello, World!"
 
-    # Membaca gambar dari request
-    file = request.files['image']
-    image = np.frombuffer(file.read(), np.uint8)
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+# @app.route('/video_feed', methods=['POST'])
+# def video_feed():
+#     if 'image' not in request.files:
+#         return jsonify({'error': 'No image provided'}), 400
 
-    # Prediksi pose
-    predicted_pose = predict_pose(image)
+#     # Membaca gambar dari request
+#     file = request.files['image']
+#     image = np.frombuffer(file.read(), np.uint8)
+#     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+#     # Prediksi pose
+#     predicted_pose = predict_pose(image)
     
-    return jsonify({'pose': predicted_pose})
+#     return jsonify({'pose': predicted_pose})
 
 if __name__ == '__main__':
     app.run(debug=True)
